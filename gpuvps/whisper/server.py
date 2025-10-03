@@ -37,6 +37,7 @@ class ConnectionState:
     def __init__(self):
         self.chunks = []  # raw bytes (Int16 LE)
         self.last_partial = 0.0
+        self.detected_language = None  # ISO code like 'en', 'nl', etc.
 
 
 async def transcribe_buffer(model, state: ConnectionState, partial=False):
@@ -48,9 +49,11 @@ async def transcribe_buffer(model, state: ConnectionState, partial=False):
         audio = np.frombuffer(all_bytes, dtype=np.int16).astype(np.float32) / 32768.0
         # whisper expects a numpy array (16kHz mono float32) or a file path
         logging.info("Running Whisper transcription (%s bytes) partial=%s", len(all_bytes), partial)
-        result = model.transcribe(audio, language="Dutch", fp16=False)
+        # Set language=None to enable automatic detection
+        result = model.transcribe(audio, language=None, fp16=False)
         text = result.get("text", "").strip()
-        return text
+        lang = result.get("language")
+        return text, lang
     except Exception as e:
         logging.exception("Transcription failed: %s", e)
         return None
@@ -77,9 +80,17 @@ async def handler(ws):
         while True:
             await asyncio.sleep(PARTIAL_INTERVAL)
             try:
-                text = await transcribe_buffer(model, state, partial=True)
-                if text:
-                    msg = json.dumps({"type": "transcript", "text": text, "partial": True})
+                out = await transcribe_buffer(model, state, partial=True)
+                if out:
+                    text, lang = out
+                    if lang and not state.detected_language:
+                        state.detected_language = lang
+                    msg = json.dumps({
+                        "type": "transcript",
+                        "text": text,
+                        "partial": True,
+                        "language": state.detected_language or lang,
+                    })
                     await ws.send(msg)
             except asyncio.CancelledError:
                 break
@@ -111,10 +122,18 @@ async def handler(ws):
                     state.chunks = [base64.b64decode(b64)]
 
                 # Do final transcription on all data
-                text = await transcribe_buffer(model, state, partial=False)
-                if text is None:
-                    text = ""
-                msg_out = json.dumps({"type": "transcript", "text": text, "partial": False})
+                out = await transcribe_buffer(model, state, partial=False)
+                if not out:
+                    out = ("", None)
+                text, lang = out
+                if lang and not state.detected_language:
+                    state.detected_language = lang
+                msg_out = json.dumps({
+                    "type": "transcript",
+                    "text": text,
+                    "partial": False,
+                    "language": state.detected_language or lang,
+                })
                 await ws.send(msg_out)
 
                 # clear buffer after final
