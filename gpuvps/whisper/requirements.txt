@@ -1,0 +1,4 @@
+websockets>=10.4
+whisper
+numpy
+soundfile
