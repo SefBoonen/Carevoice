@@ -1,5 +1,9 @@
 import path from "path";
 import express from "express";
+import WebSocket, { WebSocketServer } from 'ws';
+
+const wss = new WebSocketServer({port: 8080});
+
 
 const app = express();
 
