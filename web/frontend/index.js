@@ -33,6 +33,9 @@ class AudioStreamer {
             const message = JSON.parse(event.data);
             if (message.type === "audio-received") {
                 this.log(`Server received audio chunk: ${message.size} bytes`);
+            } else if (message.type === "transcript") {
+                const kind = message.partial ? "Partial" : "Final";
+                this.log(`${kind} transcript: ${message.text}`);
             }
         };
 

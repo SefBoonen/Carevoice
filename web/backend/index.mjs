@@ -21,6 +21,38 @@ try {
 const wss = new WebSocketServer({port: 8080});
 const app = express();
 
+// Create a WebSocket client to the local Python Whisper server
+const pyWs = new WebSocket('ws://127.0.0.1:8765');
+
+pyWs.on('open', () => {
+    console.log('Connected to Python Whisper server at ws://127.0.0.1:8765');
+});
+
+pyWs.on('message', (data) => {
+    // Broadcast transcripts from Python server to all connected frontend clients
+    try {
+        const msg = JSON.parse(data.toString());
+        if (msg.type === 'transcript') {
+            // send to every connected client
+            wss.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({ type: 'transcript', text: msg.text, partial: !!msg.partial }));
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Error processing message from Python server:', err);
+    }
+});
+
+pyWs.on('close', () => {
+    console.log('Disconnected from Python Whisper server');
+});
+
+pyWs.on('error', (err) => {
+    console.error('Python Whisper WS error:', err);
+});
+
 app.use(express.json());
 app.use(express.static(path.join("..", "frontend")));
 
@@ -80,7 +112,16 @@ wss.on('connection', (ws) => {
                 console.log(`Received audio chunk: ${audioData.length} bytes`);
                 chunks.push(audioData);
 
-                // Acknowledge
+                // Forward to Python server for near-real-time transcription if connected
+                try {
+                    if (pyWs && pyWs.readyState === WebSocket.OPEN) {
+                        pyWs.send(JSON.stringify({ type: 'audio-stream', data: message.data, timestamp: message.timestamp }));
+                    }
+                } catch (err) {
+                    console.error('Failed to forward audio chunk to Python server:', err);
+                }
+
+                // Acknowledge to the client
                 ws.send(JSON.stringify({
                     type: 'audio-received',
                     timestamp: Date.now(),
@@ -103,6 +144,16 @@ wss.on('connection', (ws) => {
                     writeWavFile(outPath, all, 16000);
                     console.log('Saved received audio to', outPath);
                     ws.send(JSON.stringify({ type: 'audio-saved', path: outPath }));
+
+                    // Notify Python server that the stream ended so it can finalize transcription
+                    try {
+                        if (pyWs && pyWs.readyState === WebSocket.OPEN) {
+                            // Only signal end; Python will transcribe buffered chunks
+                            pyWs.send(JSON.stringify({ type: 'audio-end' }));
+                        }
+                    } catch (err) {
+                        console.error('Failed to notify Python server about audio-end:', err);
+                    }
                 } catch (err) {
                     console.error('Failed to write WAV file:', err);
                     ws.send(JSON.stringify({ type: 'audio-save-error', error: String(err) }));
