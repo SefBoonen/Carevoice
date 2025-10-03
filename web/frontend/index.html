@@ -201,7 +201,15 @@
                     this.stream.getTracks().forEach(track => track.stop());
                     this.stream = null;
                 }
-                
+                // Notify server that audio stream ended so it can save buffered data
+                try {
+                    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                        this.ws.send(JSON.stringify({ type: 'audio-end', timestamp: Date.now() }));
+                    }
+                } catch (err) {
+                    // ignore send errors during shutdown
+                }
+
                 this.startBtn.disabled = false;
                 this.stopBtn.disabled = true;
                 
