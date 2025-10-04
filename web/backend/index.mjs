@@ -188,7 +188,7 @@ wss.on('connection', (ws) => {
     });
 });
 
-app.listen(3000, "0.0.0.0", () => {
+app.listen(3000, () => {
     console.log(`Server running at http://127.0.0.1:3000`);
     console.log(`WebSocket server running on ws://127.0.0.1:8080`);
 });
