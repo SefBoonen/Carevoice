@@ -31,16 +31,16 @@ async def process_chunk(audio_data, websocket):
             tmp_webm.write(audio_data)
             webm_path = tmp_webm.name
         
-        wav_path = webm_path.replace("webm", ".wav")
+        wav_path = webm_path.replace(".webm", ".wav")
         os.system(f"ffmpeg -i {webm_path} -ar 16000 -ac 1 -f wav {wav_path} -y -loglevel quiet")
         
-        segments, info = model.transcribe(wav_path, beam_size=5, language="en")
+        result: dict = model.transcribe(wav_path, beam_size=5, language="en")
         
-        for segment in segments:
+        for segment in result:
             result = {
-                "text": segment.text.strip(),
-                "start": segment.start,
-                "end": segment.end
+                "text": segment["text"].strip(),
+                "start": segment["start"],
+                "end": segment["end"]
             }
             await websocket.send(json.dumps(result))
             print(f"Transcribed: {result['text']}")
