@@ -22,7 +22,7 @@ class AudioStreamer {
     }
 
     connectWebSocket() {
-        this.ws = new WebSocket("ws://127.0.0.1:8080");
+        this.ws = new WebSocket("ws://127.0.0.1:9001");
 
         this.ws.onopen = () => {
             this.log("Connected to server");

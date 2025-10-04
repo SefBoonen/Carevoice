@@ -18,14 +18,14 @@ try {
     console.error('Failed to create received_audio directory:', err);
 }
 
-const wss = new WebSocketServer({port: 8080});
+const wss = new WebSocketServer({port: 9001});
 const app = express();
 
 // Create a WebSocket client to the local Python Whisper server
-const pyWs = new WebSocket('ws://127.0.0.1:8765');
+const pyWs = new WebSocket('ws://127.0.0.1:9002');
 
 pyWs.on('open', () => {
-    console.log('Connected to Python Whisper server at ws://127.0.0.1:8765');
+    console.log('Connected to Python Whisper server at ws://127.0.0.1:9002');
 });
 
 pyWs.on('message', (data) => {
@@ -190,5 +190,5 @@ wss.on('connection', (ws) => {
 
 app.listen(3000, () => {
     console.log(`Server running at http://127.0.0.1:3000`);
-    console.log(`WebSocket server running on ws://127.0.0.1:8080`);
+    console.log(`WebSocket server running on ws://127.0.0.1:9001`);
 });
