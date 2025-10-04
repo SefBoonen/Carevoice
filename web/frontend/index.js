@@ -1,11 +1,24 @@
 const startRecButton = document.getElementById("startrec");
 const stopRecButton = document.getElementById("stoprec");
 
+const transcriptionDiv = document.getElementById("transcription");
+
 let socket = null;
 let mediaRecorder = null;
 
 startRecButton.addEventListener("click", () => {
     socket = new WebSocket("ws://localhost:3000");
+
+    socket.onmessage((e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if(data.text) {
+                transcriptionDiv.textContent += data.text + "";
+            }
+        } catch (err) {
+            console.log(`Error: ${err}`);
+        }
+    })
     
     socket.addEventListener("open", async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
