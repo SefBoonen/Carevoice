@@ -54,7 +54,7 @@ pyWs.on('error', (err) => {
 });
 
 app.use(express.json());
-app.use(express.static(path.join("..", "frontend")));
+app.use(express.static(path.join(__dirname, "..", "frontend")));
 
 // Utility: write a 16-bit PCM WAV file (PCM s16le) with 16kHz sample rate, mono
 function writeWavFile(filePath, pcmBuffer, sampleRate = 16000) {
@@ -188,7 +188,7 @@ wss.on('connection', (ws) => {
     });
 });
 
-app.listen(3000, "127.0.0.1", () => {
+app.listen(3000, "0.0.0.0", () => {
     console.log(`Server running at http://127.0.0.1:3000`);
     console.log(`WebSocket server running on ws://127.0.0.1:8080`);
 });
