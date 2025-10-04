@@ -1,0 +1,7 @@
+services:
+  web:
+    image: sefboonen/carevoice-web
+    ports:
+      - "8080:8080"
+      - "8765:8765"
+      - "3000:3000"
