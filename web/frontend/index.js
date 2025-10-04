@@ -9,17 +9,17 @@ let mediaRecorder = null;
 startRecButton.addEventListener("click", () => {
     socket = new WebSocket("ws://localhost:3000");
 
-    socket.onmessage((e) => {
+    socket.onmessage = (e) => {
         try {
             const data = JSON.parse(e.data);
-            if(data.text) {
-                transcriptionDiv.textContent += data.text + "";
+            if (data.text) {
+                transcriptionDiv.textContent += data.text + " ";
             }
         } catch (err) {
             console.log(`Error: ${err}`);
         }
-    })
-    
+    };
+
     socket.addEventListener("open", async () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
@@ -35,6 +35,6 @@ startRecButton.addEventListener("click", () => {
 });
 
 stopRecButton.addEventListener("click", () => {
-    mediaRecorder.stop()
-    socket.close()
-})
+    mediaRecorder.stop();
+    socket.close();
+});

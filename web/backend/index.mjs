@@ -2,7 +2,7 @@ import express from "express";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import * as path from "path";
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
 import fs from "fs";
 import { spawn } from "child_process";
 
@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 const server = app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
 const wss = new WebSocketServer({ server });
 
-const whisperServer = "ws://GPUIP:8765"
+const WHISPER_SERVER = "ws://GPUIP:8765"
 
 wss.on("connection", (ws) => {
     console.log("Client connected");
