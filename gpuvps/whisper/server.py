@@ -152,8 +152,8 @@ async def handler(ws):
 
 
 async def main():
-    async with serve(handler, "127.0.0.1", 8765):
-        logging.info("Whisper WS server listening on ws://127.0.0.1:8765")
+    async with serve(handler, "127.0.0.1", 9002):
+        logging.info("Whisper WS server listening on ws://127.0.0.1:9002")
         await asyncio.Future()  # run forever
 
 
