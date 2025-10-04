@@ -12,22 +12,20 @@ const app = express();
 
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
-app.listen(3000, () => {
-    console.log(`Server running at http://localhost:3000`);
-});
+const server = app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
 
-const wss = new WebSocketServer({ server, path: "/audio" });
+const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws) => {
     console.log("Client connected");
-    const fileStream = fs.createWriteStream(`recording_${Date.now()}.webm`)
+    const fileStream = fs.createWriteStream(`recording_${Date.now()}.webm`);
 
     ws.on("message", (data) => {
         fileStream.write(data);
-    })
+    });
 
     ws.on("close", () => {
         fileStream.end();
-        console.log("audio saved")
-    })
+        console.log("audio saved");
+    });
 });
