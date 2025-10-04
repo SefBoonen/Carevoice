@@ -21,6 +21,7 @@ import logging
 from websockets import serve
 import numpy as np
 import io
+import os
 
 try:
     import whisper
@@ -29,8 +30,12 @@ except Exception:
 
 logging.basicConfig(level=logging.INFO)
 
-MODEL_NAME = "tiny"  # change to tiny/medium as needed
-PARTIAL_INTERVAL = 3.0  # seconds between partial transcriptions
+# Configurable via environment variables for containerized deployments
+MODEL_NAME = os.getenv("WHISPER_MODEL", "tiny")  # tiny/base/small/medium/large
+try:
+    PARTIAL_INTERVAL = float(os.getenv("WHISPER_PARTIAL_INTERVAL", "3.0"))
+except ValueError:
+    PARTIAL_INTERVAL = 3.0  # seconds between partial transcriptions
 
 
 class ConnectionState:
@@ -152,8 +157,14 @@ async def handler(ws):
 
 
 async def main():
-    async with serve(handler, "127.0.0.1", 9002):
-        logging.info("Whisper WS server listening on ws://127.0.0.1:9002")
+    host = os.getenv("WHISPER_HOST", "0.0.0.0")
+    try:
+        port = int(os.getenv("WHISPER_PORT", "9002"))
+    except ValueError:
+        port = 9002
+
+    async with serve(handler, host, port):
+        logging.info("Whisper WS server listening on ws://%s:%d", host, port)
         await asyncio.Future()  # run forever
 
 

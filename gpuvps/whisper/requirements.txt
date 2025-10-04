@@ -1,4 +1,4 @@
 websockets>=10.4
-whisper
+openai-whisper
 numpy
 soundfile
