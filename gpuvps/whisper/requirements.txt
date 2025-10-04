@@ -1,4 +1,0 @@
-websockets>=10.4
-openai-whisper
-numpy
-soundfile
