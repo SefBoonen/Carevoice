@@ -31,26 +31,33 @@ wss.on("connection", (ws) => {
 
     whisperWs.on("message", (data) => ws.send(data));
 
-    ws.on("message", (data) => {
-        fileStream.write(data);
+    ws.on("message", (data, isBinary) => {
+        if (isBinary) {
+            fileStream.write(data);
+        } else {
+            const message = data.toString();
+            if (message === "STOP") {
+                fileStream.end();
+                // whisperWs.close();
+
+                const ffmpeg = spawn("ffmpeg", ["-i", tempFile, "-c", "copy", finalFile]);
+
+                ffmpeg.on("close", (code) => {
+                    if (code === 0) {
+                        fs.unlinkSync(tempFile);
+                        console.log("audio saved");
+
+                        transcribeFile(finalFile, ws);
+                    } else {
+                        console.log("ffmpeg failed");
+                    }
+                });
+            }
+        }
     });
 
     ws.on("close", () => {
-        fileStream.end();
-        whisperWs.close();
-
-        const ffmpeg = spawn("ffmpeg", ["-i", tempFile, "-c", "copy", finalFile]);
-
-        ffmpeg.on("close", (code) => {
-            if (code === 0) {
-                fs.unlinkSync(tempFile);
-                console.log("audio saved");
-
-                transcribeFile(finalFile, ws);
-            } else {
-                console.log("ffmpeg failed");
-            }
-        });
+        console.log("connection closed");
     });
 });
 
@@ -62,15 +69,17 @@ function transcribeFile(filePath, clientWs) {
     whisperWs.on("open", () => {
         const fileData = fs.readFileSync(filePath);
         whisperWs.send(fileData);
-        whisperWs.close();
+        whisperWs.send("END");
         console.log(`Sent ${fileData.length} bytes to Whisper`);
     });
 
     whisperWs.on("message", (data) => {
+        const response = JSON.parse(data.toString());
+
         if (clientWs.readyState === WebSocket.OPEN) {
-            clientWs.send(data);
+            clientWs.send(JSON.stringify(response));
         }
-        console.log(`Transcription: ${data}`);
+        console.log(`Transcription: ${JSON.stringify(response)}`);
     });
 
     whisperWs.on("error", (err) => {

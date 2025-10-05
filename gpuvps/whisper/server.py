@@ -18,9 +18,10 @@ async def transcribe_audio(websocket):
         async for message in websocket:
             if isinstance(message, bytes):
                 complete_audio.extend(message)
-
-        if len(complete_audio) > 0:
-            await process_file(complete_audio, websocket)
+            elif isinstance(message, str) and message == "END":
+                if len(complete_audio) > 0:
+                    await process_file(complete_audio, websocket)
+                break
     except Exception as e:
         print(f"Error: {e}")
 

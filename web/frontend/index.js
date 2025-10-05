@@ -7,13 +7,18 @@ let socket = null;
 let mediaRecorder = null;
 
 startRecButton.addEventListener("click", () => {
+    console.log("click")
     socket = new WebSocket("ws://localhost:3000");
 
     socket.onmessage = (e) => {
+        console.log("message received");
         try {
+            console.log(`e: ${e}, json ${JSON.stringify(e)}`);
             const data = JSON.parse(e.data);
+            console.log(`data: ${data}`);
             if (data.text) {
                 transcriptionDiv.textContent += data.text + " ";
+                socket.close();
             }
         } catch (err) {
             console.log(`Error: ${err}`);
@@ -36,5 +41,6 @@ startRecButton.addEventListener("click", () => {
 
 stopRecButton.addEventListener("click", () => {
     mediaRecorder.stop();
-    socket.close();
+    socket.send("STOP");
+    // socket.close();
 });
