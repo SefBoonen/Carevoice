@@ -15,7 +15,7 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 const server = app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
 const wss = new WebSocketServer({ server });
 
-const WHISPER_SERVER = "ws://GPUIP:8765"
+const WHISPER_SERVER = "ws://127.0.0.1:9000";
 
 wss.on("connection", (ws) => {
     console.log("Client connected");
@@ -24,6 +24,11 @@ wss.on("connection", (ws) => {
     const fileStream = fs.createWriteStream(tempFile);
 
     const whisperWs = new WebSocket(WHISPER_SERVER);
+
+    whisperWs.on("open", (ws) => {
+        console.log("connected to whisper server");
+    })
+
     whisperWs.on("message", (data) => ws.send(data));
 
     ws.on("message", (data) => {
