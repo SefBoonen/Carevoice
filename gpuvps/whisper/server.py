@@ -3,10 +3,10 @@ import websockets
 import json
 import tempfile
 import os
-import whisper
+from faster_whisper import WhisperModel
 
 print("Loading model")
-model = whisper.load_model("tiny")
+model = WhisperModel("tiny", device="cpu", compute_type="int8")
 print("Model loaded")
 
 
@@ -29,35 +29,36 @@ async def transcribe_audio(websocket):
 
 async def process_chunk(audio_data, websocket):
     webm_path = None
-    
+
     try:
         with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp_webm:
             tmp_webm.write(audio_data)
             webm_path = tmp_webm.name
-            
+
         print(f"Webm: {webm_path}, len: {len(audio_data)} bytes")
 
-        wav_path = webm_path.replace(".webm", ".wav")
-        os.system(
-            f'ffmpeg -i "{webm_path}" -ar 16000 -ac 1 -f wav "{wav_path}" -y -loglevel quiet'
+        segments, info = model.transcribe(
+            webm_path,
+            language="nl",
+            beam_size=1,
+            best_of=1,
+            temperature=0,
+            vad_filter=True,
+            vad_parameters=dict(min_silence_duration_ms=500, threshold=0.5),
         )
 
-        if not os.path.exists(wav_path):
-            raise Exception(f"Wav file not created: {wav_path}")
-
-        transcription: dict = model.transcribe(wav_path, beam_size=5, language="en")
-
-        for segment in transcription["segments"]:
-            result = {
-                "text": segment["text"].strip(),
-                "start": segment["start"],
-                "end": segment["end"],
-            }
-            await websocket.send(json.dumps(result))
-            print(f"Transcribed: {result['text']}")
+        for segment in segments:
+            print(segment)
+            if segment.text.strip():
+                response = {
+                    "text": segment.text.strip(),
+                    "start": segment.start,
+                    "end": segment.end
+                }
+            await websocket.send(json.dumps(response))
+            print(f"Transcribed: {response['text']}")
 
         os.remove(webm_path)
-        os.remove(wav_path)
 
     except Exception as e:
         print(f"Transcription error: {e}")

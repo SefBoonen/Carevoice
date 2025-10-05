@@ -27,7 +27,7 @@ wss.on("connection", (ws) => {
 
     whisperWs.on("open", (ws) => {
         console.log("connected to whisper server");
-    })
+    });
 
     whisperWs.on("message", (data) => ws.send(data));
 
@@ -47,9 +47,35 @@ wss.on("connection", (ws) => {
             if (code === 0) {
                 fs.unlinkSync(tempFile);
                 console.log("audio saved");
+
+                transcribeFile(finalFile, ws);
             } else {
                 console.log("ffmpeg failed");
             }
         });
     });
 });
+
+function transcribeFile(filePath, clientWs) {
+    console.log(`Sending ${filePath} to Whisper...`);
+
+    const whisperWs = new WebSocket(WHISPER_SERVER);
+
+    whisperWs.on("open", () => {
+        const fileData = fs.readFileSync(filePath);
+        whisperWs.send(fileData);
+        whisperWs.close();
+        console.log(`Sent ${fileData.length} bytes to Whisper`);
+    });
+
+    whisperWs.on("message", (data) => {
+        if (clientWs.readyState === WebSocket.OPEN) {
+            clientWs.send(data);
+        }
+        console.log(`Transcription: ${data}`);
+    });
+
+    whisperWs.on("error", (err) => {
+        console.log("Whisper error:", err.message);
+    });
+}
