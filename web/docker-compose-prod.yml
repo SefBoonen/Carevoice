@@ -4,5 +4,5 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - WHISPER_SERVER_URL=ws://your-whisper-server.com:9000  # Production Whisper server
+      - WHISPER_SERVER_URL=ws://77.104.167.148:40353  # Production Whisper server
     restart: unless-stopped
