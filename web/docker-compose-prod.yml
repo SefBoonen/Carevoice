@@ -1,7 +1,8 @@
 services:
   web:
-    image: sefboonen/carevoice-web
+    image: sefboonen/carevoice-web:latest
     ports:
-      - "9001:9001"
-      - "9002:9002"
       - "3000:3000"
+    environment:
+      - WHISPER_SERVER_URL=ws://your-whisper-server.com:9000  # Production Whisper server
+    restart: unless-stopped

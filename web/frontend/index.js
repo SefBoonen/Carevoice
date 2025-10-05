@@ -7,8 +7,10 @@ let socket = null;
 let mediaRecorder = null;
 
 startRecButton.addEventListener("click", () => {
-    console.log("click")
-    socket = new WebSocket("ws://localhost:3000");
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}`;
+
+    socket = new WebSocket(wsUrl);
 
     socket.onmessage = (e) => {
         console.log("message received");

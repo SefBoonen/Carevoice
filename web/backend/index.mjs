@@ -15,7 +15,8 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 const server = app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
 const wss = new WebSocketServer({ server });
 
-const WHISPER_SERVER = "ws://127.0.0.1:9000";
+const WHISPER_SERVER = process.env.WHISPER_SERVER_URL || "ws://127.0.0.1:9000";
+console.log(`Whisper server URL: ${WHISPER_SERVER}`);
 
 wss.on("connection", (ws) => {
     console.log("Client connected");

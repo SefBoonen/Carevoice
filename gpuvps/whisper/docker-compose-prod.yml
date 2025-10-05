@@ -1,0 +1,6 @@
+services:
+  whisper:
+    image: sefboonen/carevoice-whisper:latest
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
