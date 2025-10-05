@@ -33,8 +33,6 @@ wss.on("connection", (ws) => {
 
     ws.on("message", (data) => {
         fileStream.write(data);
-
-        if (whisperWs.readyState === WebSocket.OPEN) whisperWs.send(data);
     });
 
     ws.on("close", () => {
