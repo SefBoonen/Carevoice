@@ -12,49 +12,44 @@ print("Model loaded")
 
 async def transcribe_audio(websocket):
     print(f"Client connected from {websocket.remote_address}")
-    audio_buffer = bytearray()
+    complete_audio = bytearray()
 
     try:
         async for message in websocket:
             if isinstance(message, bytes):
-                audio_buffer.extend(message)
+                complete_audio.extend(message)
 
-                if len(audio_buffer) >= 18000:
-                    await process_chunk(audio_buffer, websocket)
-                    audio_buffer = audio_buffer[-6000:]
+        if len(complete_audio) > 0:
+            await process_file(complete_audio, websocket)
     except Exception as e:
         print(f"Error: {e}")
-        await websocket.send(json.dumps({"error": str(e)}))
 
 
-async def process_chunk(audio_data, websocket):
+async def process_file(audio_data, websocket):
     webm_path = None
 
     try:
-        with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp_webm:
-            tmp_webm.write(audio_data)
-            webm_path = tmp_webm.name
+        with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
+            tmp.write(audio_data)
+            webm_path = tmp.name
 
         print(f"Webm: {webm_path}, len: {len(audio_data)} bytes")
 
         segments, info = model.transcribe(
             webm_path,
-            language="nl",
-            beam_size=1,
-            best_of=1,
-            temperature=0,
+            language="en",
+            beam_size=5,
             vad_filter=True,
-            vad_parameters=dict(min_silence_duration_ms=500, threshold=0.5),
         )
-
+        
+        full_text = ""
         for segment in segments:
-            print(segment)
             if segment.text.strip():
-                response = {
-                    "text": segment.text.strip(),
-                    "start": segment.start,
-                    "end": segment.end
-                }
+                full_text += segment.text.strip() + " "
+                print(f" {segment.text.strip()}")
+                
+        if full_text:
+            response = {"text": full_text.strip()} 
             await websocket.send(json.dumps(response))
             print(f"Transcribed: {response['text']}")
 
@@ -62,7 +57,6 @@ async def process_chunk(audio_data, websocket):
 
     except Exception as e:
         print(f"Transcription error: {e}")
-        await websocket.send(json.dumps({"error": str(e)}))
 
 
 async def main():
