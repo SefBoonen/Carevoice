@@ -6,7 +6,7 @@ import os
 from faster_whisper import WhisperModel
 
 print("Loading model")
-model = WhisperModel("tiny", device="cpu", compute_type="int8")
+model = WhisperModel("large-v3", device="cuda", compute_type="float16")
 print("Model loaded")
 
 
@@ -38,9 +38,11 @@ async def process_file(audio_data, websocket):
 
         segments, info = model.transcribe(
             webm_path,
-            language="en",
+            language="nl",
             beam_size=5,
             vad_filter=True,
+            word_timestamps=True,
+            condition_on_previous_text=True,
         )
         
         full_text = ""
