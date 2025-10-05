@@ -1,8 +1,6 @@
 services:
   whisper:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: sefboonen/carevoice-whisper:cudo
     ports:
       - "9000:9000"
     restart: unless-stopped
