@@ -1,7 +1,0 @@
-FROM ollama/ollama:latest
-
-# Model downloaden tijdens de build
-RUN ollama pull gpt-oss-20b
-
-# Start Ollama server
-CMD ["ollama", "serve"]

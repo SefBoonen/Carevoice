@@ -1,0 +1,10 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - WHISPER_SERVER_URL=ws://host.docker.internal:9000
+      - LLM_SERVER=ws://host.docker.internal:8000

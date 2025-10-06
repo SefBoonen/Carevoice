@@ -1,0 +1,9 @@
+services:
+  web:
+    image: sefboonen/carevoice-web:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - WHISPER_SERVER_URL=ws://77.104.167.148:40353  # Production Whisper server
+      - LLM_SERVER=http://77.104.167.148:40465/v1/
+    restart: unless-stopped
