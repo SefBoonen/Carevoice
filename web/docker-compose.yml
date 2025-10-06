@@ -8,3 +8,6 @@ services:
     environment:
       - WHISPER_SERVER_URL=ws://host.docker.internal:9000
       - LLM_SERVER=ws://host.docker.internal:8000
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
