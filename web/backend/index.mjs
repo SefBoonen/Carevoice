@@ -83,6 +83,9 @@ function transcribeFile(filePath, clientWs) {
         if (clientWs.readyState === WebSocket.OPEN) {
             clientWs.send(JSON.stringify(response));
         }
+
+        // add api request to llm
+
         console.log(`Transcription: ${JSON.stringify(response)}`);
     });
 
