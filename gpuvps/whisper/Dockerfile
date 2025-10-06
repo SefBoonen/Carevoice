@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04
+FROM nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04
 
 WORKDIR /app
 
@@ -24,4 +24,4 @@ EXPOSE 9000
 ENV ORT_LOGGING_LEVEL=3
 
 # Run the server
-CMD ["python3", "server.py"]
+CMD ["python3", "-u", "server.py"]
