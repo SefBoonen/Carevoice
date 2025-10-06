@@ -1,12 +1,6 @@
 services:
   vllm:
-    image: vllm/vllm-openai:latest
-    runtime: nvidia
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:latest
     environment:
       - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
     volumes:
@@ -14,20 +8,13 @@ services:
     ports:
       - "8000:8000"
     ipc: host
-    command: --model Qwen/Qwen3-0.6B
+    command: --model facebook/opt-125m --device cpu --dtype float32
     
   whisper:
     image: sefboonen/carevoice-whisper:latest
     ports:
       - "9000:9000"
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - ORT_LOGGING_LEVEL=3
