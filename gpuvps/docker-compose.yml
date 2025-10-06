@@ -14,7 +14,7 @@ services:
     ports:
       - "8000:8000"
     ipc: host
-    command: --model openai/gpt-oss-20b --dtype bfloat16
+    command: --model openai/gpt-oss-20b --dtype bfloat16 --gpu-memory-utilization 0.80
     
   whisper:
     image: sefboonen/carevoice-whisper:latest
