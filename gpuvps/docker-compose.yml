@@ -15,3 +15,19 @@ services:
       - "8000:8000"
     ipc: host
     command: --model Qwen/Qwen3-0.6B
+    
+  whisper:
+    image: sefboonen/carevoice-whisper:latest
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - ORT_LOGGING_LEVEL=3
