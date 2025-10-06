@@ -18,6 +18,9 @@ const wss = new WebSocketServer({ server });
 const WHISPER_SERVER = process.env.WHISPER_SERVER_URL || "ws://127.0.0.1:9000";
 console.log(`Whisper server URL: ${WHISPER_SERVER}`);
 
+const LLM_SERVER = process.env.LLM_SERVER || "ws://127.0.0.1:8000";
+console.log(`Whisper server URL: ${LLM_SERVER}`);
+
 wss.on("connection", (ws) => {
     console.log("Client connected");
     const tempFile = `temp_${Date.now()}.webm`;
