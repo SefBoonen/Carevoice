@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +8,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button id="startrec">start recording</button>
-    <button id="stoprec">stop recording</button>
-    <div id="transcription"></div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">Carevoice</h1>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Home</a>
+                <a href="#" class="nav-link">Over</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h2>Spraak Transcriptie</h2>
+            <p>Klik op de knop om je stem op te nemen</p>
+            
+            <div class="button-group">
+                <button id="recordbtn" class="btn btn-primary">
+                    <span class="btn-icon">▶️</span>
+                    <span class="btn-text">Start Opname</span>
+                </button>
+            </div>
+
+            <div class="transcription-container">
+                <h3>Transcriptie</h3>
+                <div id="transcription" class="transcription-text"></div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
