@@ -84,8 +84,6 @@ function transcribeFile(filePath, clientWs) {
 
         if (clientWs.readyState === WebSocket.OPEN) {
             clientWs.send(JSON.stringify({ type: "transcription", data: response }));
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // add api request to llm
@@ -93,12 +91,12 @@ function transcribeFile(filePath, clientWs) {
 
         console.log(`Summary: ${summary}`);
 
-        // if(summary && clientWs.readyState === WebSocket.OPEN) {
+        if(summary && clientWs.readyState === WebSocket.OPEN) {
             clientWs.send(JSON.stringify({
                 type: "summary",
                 data: summary
             }))
-        // }
+        }
         console.log("gestuurd")
     });
 

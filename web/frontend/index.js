@@ -3,6 +3,8 @@ const btnIcon = document.querySelector(".btn-icon");
 const btnText = document.querySelector(".btn-text");
 const transcriptionDiv = document.getElementById("transcription");
 
+const summaryDiv = document.getElementById("summary");
+
 let socket = null;
 let mediaRecorder = null;
 let isRecording = false;
@@ -41,7 +43,10 @@ async function startRecording() {
                     transcriptionDiv.textContent += data.data.text + " ";
                 }
             } else if (data.type === "summary") {
-                console.log(data.data);
+                console.log(`samenvatting: ${data.data}`);
+                if (data.data) {
+                    summaryDiv.textContent += data.data + " ";
+                }
                 socket.close();
                 resetButton();
             }
