@@ -6,5 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - WHISPER_SERVER_URL=ws://host.docker.internal:9000
-      - LLM_SERVER=ws://host.docker.internal:8000
+      - WHISPER_SERVER_URL=${WHISPER_SERVER_URL}
+      - LLM_SERVER=${LLM_SERVER}
+    env_file:
+      - .env

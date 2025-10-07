@@ -73,8 +73,6 @@ function stopRecording() {
         socket.send("STOP");
     }
     
-    // Button will reset when transcription arrives
-    // Or you can reset immediately:
     resetButton();
 }
 
