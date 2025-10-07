@@ -167,17 +167,17 @@ body {
 }
 
 /* ========== Transcription Area ========== */
-.transcription-container {
+.transcription-container, .summary-container {
     margin-top: 2rem;
 }
 
-.transcription-container h3 {
+.transcription-container h3, .summary-container h3 {
     font-size: 1.25rem;
     margin-bottom: 1rem;
     color: var(--text-color);
 }
 
-.transcription-text {
+.transcription-text, .summary-text {
     background-color: var(--bg-color);
     border: 2px solid var(--border-color);
     border-radius: 8px;
@@ -189,8 +189,14 @@ body {
     white-space: pre-wrap;
 }
 
-.transcription-text:empty::before {
-    content: 'Your transcription will appear here...';
+.transcription-text:empty::before  {
+    content: 'Uw transcriptie verschijnt hier...';
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.summary-text:empty::before  {
+    content: 'Uw samenvatting verschijnt hier...';
     color: var(--text-muted);
     font-style: italic;
 }
