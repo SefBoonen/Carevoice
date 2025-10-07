@@ -51,7 +51,7 @@ wss.on("connection", (ws) => {
                         fs.unlinkSync(tempFile);
                         console.log("audio saved");
 
-                        transcribeFile(finalFile, ws);
+                        transcribeFile("./langgesprek.webm", ws);
                     } else {
                         console.log("ffmpeg failed");
                     }
@@ -127,7 +127,7 @@ async function summarizeTranscription(text) {
                 messages: [
                     {
                         role: "system",
-                        content: "Je bent een behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de samenvatting geen commentaar voor de rest.",
+                        content: "Je bent een Nederlandse behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de samenvatting geen commentaar voor de rest, in het Nederlands.",
                     },
                     {
                         role: "user",
