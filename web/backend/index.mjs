@@ -72,7 +72,15 @@ function transcribeFile(filePath, clientWs) {
 
     whisperWs.on("open", () => {
         const fileData = fs.readFileSync(filePath);
-        whisperWs.send(fileData);
+        const chunkSize = 64* 1024;
+        let offset = 0;
+
+        while(offset < fileData.length) {
+            const chunk = fileData.subarray(offset, Math.min(offset + chunkSize, fileData.length));
+            whisperWs.send(chunk);
+            offset += chunkSize;
+        }
+
         whisperWs.send("END");
         console.log(`Sent ${fileData.length} bytes to Whisper`);
     });
