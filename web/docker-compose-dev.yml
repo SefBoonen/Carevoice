@@ -7,8 +7,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - WHISPER_SERVER_URL=ws://77.104.167.148:40353  # Production Whisper server
+      - WHISPER_SERVER_URL=ws://77.104.167.148:40353
       - LLM_SERVER=http://77.104.167.148:40465/v1/
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
       - ./frontend:/app/frontend

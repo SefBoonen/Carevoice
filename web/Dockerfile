@@ -4,9 +4,10 @@ WORKDIR /app
 
 RUN apk add ffmpeg
 
-COPY backend/package*.json ./
-COPY ./backend ./
+COPY ./backend ./backend
 COPY ./frontend ./frontend
+
+WORKDIR /app/backend
 
 FROM base AS prod
 RUN npm install
