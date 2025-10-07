@@ -51,7 +51,7 @@ wss.on("connection", (ws) => {
                         fs.unlinkSync(tempFile);
                         console.log("audio saved");
 
-                        transcribeFile("./langgesprek.webm", ws);
+                        transcribeFile(finalFile, ws);
                     } else {
                         console.log("ffmpeg failed");
                     }
