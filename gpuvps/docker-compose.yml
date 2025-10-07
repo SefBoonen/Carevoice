@@ -14,8 +14,8 @@ services:
     ports:
       - "8000:8000"
     ipc: host
-    command: --model openai/gpt-oss-20b --dtype bfloat16 --gpu-memory-utilization 0.7
-    
+    command: --model openai/gpt-oss-20b --dtype bfloat16 --gpu-memory-utilization 0.80
+
   whisper:
     image: sefboonen/carevoice-whisper:latest
     ports:
@@ -33,4 +33,4 @@ services:
       - ORT_LOGGING_LEVEL=3
       - DEVICE_MODE=cuda
       - MODEL_NAME=large-v3
-      - COMPUTE_FLOAT=float16
+      - COMPUTE_FLOAT=int8_float16
