@@ -5,11 +5,11 @@ import tempfile
 import os
 from faster_whisper import WhisperModel
 
-DEVICE_MODE = os.environ.get('device_mode', "cpu")
+DEVICE_MODE = os.environ.get('DEVICE_MODE', "cpu")
 MODEL_NAME = os.environ.get('MODEL_NAME', "tiny")
 COMPUTE_FLOAT = os.environ.get('COMPUTE_FLOAT', "int8")
 
-print("Loading model")
+print(f"Loading model with mode: {DEVICE_MODE}, model: {MODEL_NAME}, computefloat: {COMPUTE_FLOAT}")
 model = WhisperModel(MODEL_NAME, device=DEVICE_MODE, compute_type=COMPUTE_FLOAT)
 print("Model loaded")
 
