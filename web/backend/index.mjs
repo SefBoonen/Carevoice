@@ -117,7 +117,7 @@ async function summarizeTranscription(text) {
                 messages: [
                     {
                         role: "system",
-                        content: "Je bent een behulpzame assistent die medische gesprekken beknopt samenvat.",
+                        content: "Je bent een behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de samenvatting geen commentaar voor de rest.",
                     },
                     {
                         role: "user",
