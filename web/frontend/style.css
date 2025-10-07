@@ -1,15 +1,17 @@
-/* ========== CSS Variables - Change these to customize colors! ========== */
+/* ========== CSS Variables - Professional Healthcare Theme ========== */
 :root {
-    --primary-color: #6366f1;      /* Main brand color (indigo) */
-    --primary-dark: #4f46e5;       /* Darker shade for hover */
-    --danger-color: #ef4444;       /* Red for stop button */
-    --danger-dark: #dc2626;        /* Darker red for hover */
-    --bg-color: #f8fafc;           /* Light background */
-    --card-bg: #ffffff;            /* Card background */
-    --text-color: #1e293b;         /* Dark text */
-    --text-muted: #64748b;         /* Muted text */
-    --border-color: #e2e8f0;       /* Light border */
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --primary-color: #2563eb;      /* Professional blue */
+    --primary-dark: #1e40af;       /* Darker blue for hover */
+    --danger-color: #dc2626;       /* Professional red */
+    --danger-dark: #b91c1c;        /* Darker red for hover */
+    --bg-color: #f9fafb;           /* Subtle gray background */
+    --card-bg: #ffffff;            /* White card background */
+    --text-color: #111827;         /* Almost black text */
+    --text-muted: #6b7280;         /* Professional gray */
+    --border-color: #e5e7eb;       /* Light gray border */
+    --accent-color: #059669;       /* Green for success states */
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 /* ========== Reset & Base Styles ========== */
@@ -20,21 +22,23 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    font-size: 16px;
 }
 
 /* ========== Navbar ========== */
 .navbar {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 1rem 0;
-    box-shadow: var(--shadow);
+    background-color: #ffffff;
+    color: var(--text-color);
+    padding: 1.25rem 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .nav-container {
@@ -48,96 +52,90 @@ body {
 
 .logo {
     font-size: 1.5rem;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.5px;
+    color: var(--primary-color);
 }
 
 .nav-links {
     display: flex;
-    gap: 2rem;
+    gap: 2.5rem;
 }
 
 .nav-link {
-    color: white;
+    color: var(--text-color);
     text-decoration: none;
     font-weight: 500;
-    transition: opacity 0.2s;
+    font-size: 0.9375rem;
+    transition: color 0.2s;
 }
 
 .nav-link:hover {
-    opacity: 0.8;
+    color: var(--primary-color);
 }
 
 /* ========== Main Content ========== */
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 3rem auto;
     padding: 0 2rem;
 }
 
 .card {
     background: var(--card-bg);
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: var(--shadow);
+    border-radius: 8px;
+    padding: 3rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
 }
 
 .card h2 {
-    font-size: 2rem;
+    font-size: 1.875rem;
     margin-bottom: 0.5rem;
     color: var(--text-color);
+    font-weight: 600;
+    letter-spacing: -0.025em;
 }
 
 .card > p {
     color: var(--text-muted);
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
 }
 
 /* ========== Buttons ========== */
 .button-group {
     display: flex;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     flex-wrap: wrap;
 }
 
-/* Add this to the existing .btn styles */
 .btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;  /* Changed to 0.3s for smoother color transition */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+    letter-spacing: 0.01em;
 }
 
 .btn-icon {
-    font-size: 1.25rem;
-    transition: transform 0.3s ease;
+    font-size: 1.125rem;
+    transition: transform 0.2s ease;
 }
 
-/* Optional: Add a pulse animation when recording */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
-}
-
-.btn-danger .btn-icon {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
+/* Removed pulse animation for professional look */
 .btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .btn:active {
@@ -162,43 +160,52 @@ body {
     background-color: var(--danger-dark);
 }
 
-.btn-icon {
-    font-size: 1.25rem;
+/* ========== Transcription & Summary Areas ========== */
+.transcription-container, 
+.summary-container {
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border-color);
 }
 
-/* ========== Transcription Area ========== */
-.transcription-container, .summary-container {
-    margin-top: 2rem;
+.transcription-container:first-of-type {
+    border-top: none;
+    padding-top: 0;
 }
 
-.transcription-container h3, .summary-container h3 {
-    font-size: 1.25rem;
+.transcription-container h3, 
+.summary-container h3 {
+    font-size: 1.125rem;
     margin-bottom: 1rem;
     color: var(--text-color);
+    font-weight: 600;
+    letter-spacing: -0.0125em;
 }
 
-.transcription-text, .summary-text {
-    background-color: var(--bg-color);
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
+.transcription-text, 
+.summary-text {
+    background-color: #fafafa;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     padding: 1.5rem;
     min-height: 150px;
-    font-size: 1.125rem;
-    line-height: 1.8;
+    font-size: 0.9375rem;
+    line-height: 1.75;
     color: var(--text-color);
     white-space: pre-wrap;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.transcription-text:empty::before  {
+.transcription-text:empty::before {
     content: 'Uw transcriptie verschijnt hier...';
     color: var(--text-muted);
-    font-style: italic;
+    font-style: normal;
 }
 
-.summary-text:empty::before  {
+.summary-text:empty::before {
     content: 'Uw samenvatting verschijnt hier...';
     color: var(--text-muted);
-    font-style: italic;
+    font-style: normal;
 }
 
 /* ========== Responsive Design ========== */
@@ -219,6 +226,10 @@ body {
     }
 
     .card {
-        padding: 1.5rem;
+        padding: 2rem;
+    }
+    
+    .card h2 {
+        font-size: 1.5rem;
     }
 }
