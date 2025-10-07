@@ -78,6 +78,7 @@ function transcribeFile(filePath, clientWs) {
     });
 
     whisperWs.on("message", (data) => {
+
         const response = JSON.parse(data.toString());
 
         if (clientWs.readyState === WebSocket.OPEN) {

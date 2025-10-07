@@ -31,3 +31,6 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - ORT_LOGGING_LEVEL=3
+      - DEVICE_MODE=cuda
+      - MODEL_NAME=large-v3
+      - COMPUTE_FLOAT=float16
