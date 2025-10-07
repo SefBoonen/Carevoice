@@ -18,13 +18,13 @@ recordBtn.addEventListener("click", () => {
 async function startRecording() {
     console.log("Starting recording...");
     isRecording = true;
-    
+
     // Update button appearance
     recordBtn.classList.remove("btn-primary");
     recordBtn.classList.add("btn-danger");
     btnIcon.textContent = "⏹️";
     btnText.textContent = "Stop Opname";
-    
+
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}`;
 
@@ -35,8 +35,13 @@ async function startRecording() {
         try {
             const data = JSON.parse(e.data);
             console.log(`data:`, data);
-            if (data.text) {
-                transcriptionDiv.textContent += data.text + " ";
+
+            if (data.type === "transcription") {
+                if (data.data.text) {
+                    transcriptionDiv.textContent += data.data.text + " ";
+                }
+            } else if (data.type === "summary") {
+                console.log(data.data);
                 socket.close();
                 resetButton();
             }
@@ -46,7 +51,9 @@ async function startRecording() {
     };
 
     socket.addEventListener("open", async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 16000, channelCount: 1 },
+        });
         mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
 
         mediaRecorder.addEventListener("dataavailable", (event) => {
@@ -61,18 +68,18 @@ async function startRecording() {
 
 function stopRecording() {
     console.log("Stopping recording...");
-    
+
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
-        
+
         // Stop all audio tracks
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        mediaRecorder.stream.getTracks().forEach((track) => track.stop());
     }
-    
+
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send("STOP");
     }
-    
+
     resetButton();
 }
 

@@ -33,7 +33,7 @@ wss.on("connection", (ws) => {
         console.log("connected to whisper server");
     });
 
-    whisperWs.on("message", (data) => ws.send(data));
+    // whisperWs.on("message", (data) => ws.send(data));
 
     ws.on("message", (data, isBinary) => {
         if (isBinary) {
@@ -77,20 +77,64 @@ function transcribeFile(filePath, clientWs) {
         console.log(`Sent ${fileData.length} bytes to Whisper`);
     });
 
-    whisperWs.on("message", (data) => {
-
+    whisperWs.on("message", async (data) => {
         const response = JSON.parse(data.toString());
 
+        console.log(`Transcription: ${JSON.stringify(response.text)}`);
+
         if (clientWs.readyState === WebSocket.OPEN) {
-            clientWs.send(JSON.stringify(response));
+            clientWs.send(JSON.stringify({ type: "transcription", data: response }));
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // add api request to llm
+        const summary = await summarizeTranscription(response.text);
 
-        console.log(`Transcription: ${JSON.stringify(response)}`);
+        console.log(`Summary: ${summary}`);
+
+        // if(summary && clientWs.readyState === WebSocket.OPEN) {
+            clientWs.send(JSON.stringify({
+                type: "summary",
+                data: summary
+            }))
+        // }
+        console.log("gestuurd")
     });
 
     whisperWs.on("error", (err) => {
         console.log("Whisper error:", err.message);
     });
+}
+
+async function summarizeTranscription(text) {
+    try {
+        const response = await fetch(`${LLM_SERVER}/v1/chat/completions`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-oss-20b", // or your model name
+                messages: [
+                    {
+                        role: "system",
+                        content: "Je bent een behulpzame assistent die medische gesprekken beknopt samenvat.",
+                    },
+                    {
+                        role: "user",
+                        content: `Vat alsjeblieft de volgende transcriptie samen: ${text}`,
+                    },
+                ],
+                temperature: 0.7,
+                max_tokens: 500,
+            }),
+        });
+
+        const data = await response.json();
+        return await data.choices[0].message.content;
+    } catch (error) {
+        console.error("LLM error:", error.message);
+        return null;
+    }
 }
