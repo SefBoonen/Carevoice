@@ -58,8 +58,7 @@ async function transcribeFile(filePath, clientWs) {
 
     const transcription = await groq.audio.transcriptions.create({
         file: fs.createReadStream(filePath), // Required path to audio file - replace with your audio file!
-        model: "whisper-large-v3-turbo", // Required model to use for transcription
-        prompt: "Specify context or spelling", // Optional
+        model: "whisper-large-v3", // Required model to use for transcription
         response_format: "verbose_json", // Optional
         timestamp_granularities: ["word", "segment"], // Optional (must set response_format to "json" to use and can specify "word", "segment" (default), or both)
         language: "nl", // Optional
