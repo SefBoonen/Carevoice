@@ -1,6 +1,6 @@
 services:
   web:
-    image: sefboonen/carevoice-web:latest
+    image: sefboonen/carevoice-web:groq
     ports:
       - "3000:3000"
     env_file:
