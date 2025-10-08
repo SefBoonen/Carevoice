@@ -21,7 +21,7 @@ const wss = new WebSocketServer({ server });
 wss.on("connection", (ws) => {
     console.log("Client connected");
     const tempFile = `temp_${Date.now()}.webm`;
-    const finalFile = `recording_${Date.now()}.webm`;
+    const finalFile = `./recordings/recording_${Date.now()}.webm`;
     const fileStream = fs.createWriteStream(tempFile);
 
     ws.on("message", (data, isBinary) => {
