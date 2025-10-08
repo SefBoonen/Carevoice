@@ -5,6 +5,9 @@ import * as path from "path";
 import { WebSocketServer, WebSocket } from "ws";
 import fs from "fs";
 import { spawn } from "child_process";
+import Groq from "groq-sdk";
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -65,82 +68,64 @@ wss.on("connection", (ws) => {
     });
 });
 
-function transcribeFile(filePath, clientWs) {
+async function transcribeFile(filePath, clientWs) {
     console.log(`Sending ${filePath} to Whisper...`);
 
-    const whisperWs = new WebSocket(WHISPER_SERVER);
-
-    whisperWs.on("open", () => {
-        const fileData = fs.readFileSync(filePath);
-        const chunkSize = 64 * 1024;
-        let offset = 0;
-
-        while(offset < fileData.length) {
-            const chunk = fileData.subarray(offset, Math.min(offset + chunkSize, fileData.length));
-            whisperWs.send(chunk);
-            offset += chunkSize;
-        }
-
-        setTimeout(() => {
-            whisperWs.send("END");
-            console.log(`Sent ${fileData.length} bytes to Whisper in chunks`);
-        }, 100);
+    const transcription = await groq.audio.transcriptions.create({
+        file: fs.createReadStream(filePath), // Required path to audio file - replace with your audio file!
+        model: "whisper-large-v3-turbo", // Required model to use for transcription
+        prompt: "Specify context or spelling", // Optional
+        response_format: "verbose_json", // Optional
+        timestamp_granularities: ["word", "segment"], // Optional (must set response_format to "json" to use and can specify "word", "segment" (default), or both)
+        language: "nl", // Optional
+        temperature: 0.0, // Optional
     });
+    const textTranscription = transcription.text;
 
-    whisperWs.on("message", async (data) => {
-        const response = JSON.parse(data.toString());
+    // To print only the transcription text, you'd use console.log(transcription.text); (here we're printing the entire transcription object to access timestamps)
 
-        console.log(`Transcription: ${JSON.stringify(response.text)}`);
+    console.log(`Transcription: ${JSON.stringify(transcription, null, 4)}`);
 
-        if (clientWs.readyState === WebSocket.OPEN) {
-            clientWs.send(JSON.stringify({ type: "transcription", data: response }));
-        }
+    if (clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(JSON.stringify({ type: "transcription", data: transcription }));
+    }
 
-        // add api request to llm
-        const summary = await summarizeTranscription(response.text);
+    // add api request to llm
+    const summary = (await summarizeTranscription(textTranscription));
+    const textSummary = summary.choices[0].message.content;
+    // const summary = (await summarizeTranscription(transcription.text)).choices[0].message.content;
 
-        console.log(`Summary: ${summary}`);
+    console.log(`Summary: ${JSON.stringify(summary, null, 4)}`);
 
-        if(summary && clientWs.readyState === WebSocket.OPEN) {
-            clientWs.send(JSON.stringify({
+    if (summary && clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(
+            JSON.stringify({
                 type: "summary",
-                data: summary
-            }))
-        }
-        console.log("gestuurd")
-    });
+                data: textSummary,
+            })
+        );
+    }
 
-    whisperWs.on("error", (err) => {
-        console.log("Whisper error:", err.message);
-    });
+    console.log("gestuurd");
 }
 
 async function summarizeTranscription(text) {
     try {
-        const response = await fetch(`${LLM_SERVER}/v1/chat/completions`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                model: "openai/gpt-oss-20b", // or your model name
-                messages: [
-                    {
-                        role: "system",
-                        content: "Je bent een Nederlandse behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de samenvatting geen commentaar voor de rest, in het Nederlands.",
-                    },
-                    {
-                        role: "user",
-                        content: `Vat alsjeblieft de volgende transcriptie samen: ${text}`,
-                    },
-                ],
-                temperature: 0.7,
-                max_tokens: 500,
-            }),
-        });
+        return groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "Je bent een Nederlandse behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de samenvatting geen commentaar voor de rest, in het Nederlands. Geef altijd een samenvatting geef nooit commentaar of vraag nooit wat anders, wat de tekst ook is.",
+                },
+                {
+                    role: "user",
+                    content: `Vat alsjeblieft de volgende transcriptie samen: ${text}`,
+                },
+            ],
 
-        const data = await response.json();
-        return await data.choices[0].message.content;
+            model: "openai/gpt-oss-20b",
+        });
     } catch (error) {
         console.error("LLM error:", error.message);
         return null;
