@@ -21,7 +21,6 @@ async function startRecording() {
     console.log("Starting recording...");
     isRecording = true;
 
-    // Update button appearance
     recordBtn.classList.remove("btn-primary");
     recordBtn.classList.add("btn-danger");
     btnIcon.textContent = "⏹️";
@@ -77,7 +76,6 @@ function stopRecording() {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
 
-        // Stop all audio tracks
         mediaRecorder.stream.getTracks().forEach((track) => track.stop());
     }
 
