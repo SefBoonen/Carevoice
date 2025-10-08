@@ -66,20 +66,15 @@ async function transcribeFile(filePath, clientWs) {
     });
     const textTranscription = transcription.text;
 
-    // To print only the transcription text, you'd use console.log(transcription.text); (here we're printing the entire transcription object to access timestamps)
-
     console.log(`Transcription: ${textTranscription}`);
 
     if (clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(JSON.stringify({ type: "transcription", data: transcription }));
     }
 
-    // add api request to llm
     const summary = (await summarizeTranscription(textTranscription));
     const textSummary = summary.choices[0].message.content;
-    // const summary = (await summarizeTranscription(transcription.text)).choices[0].message.content;
 
-    // console.log(`Summary: ${JSON.stringify(summary, null, 4)}`);
     console.log(`Summary: ${textSummary}`);
 
     if (summary && clientWs.readyState === WebSocket.OPEN) {
