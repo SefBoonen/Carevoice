@@ -18,25 +18,11 @@ app.use(express.static(path.join(__dirname, "..", "frontend")));
 const server = app.listen(3000, () => console.log(`Server running at http://localhost:3000`));
 const wss = new WebSocketServer({ server });
 
-const WHISPER_SERVER = process.env.WHISPER_SERVER_URL || "ws://127.0.0.1:9000";
-console.log(`Whisper server URL: ${WHISPER_SERVER}`);
-
-const LLM_SERVER = process.env.LLM_SERVER || "ws://127.0.0.1:8000";
-console.log(`Whisper server URL: ${LLM_SERVER}`);
-
 wss.on("connection", (ws) => {
     console.log("Client connected");
     const tempFile = `temp_${Date.now()}.webm`;
     const finalFile = `recording_${Date.now()}.webm`;
     const fileStream = fs.createWriteStream(tempFile);
-
-    const whisperWs = new WebSocket(WHISPER_SERVER);
-
-    whisperWs.on("open", (ws) => {
-        console.log("connected to whisper server");
-    });
-
-    // whisperWs.on("message", (data) => ws.send(data));
 
     ws.on("message", (data, isBinary) => {
         if (isBinary) {
@@ -45,7 +31,6 @@ wss.on("connection", (ws) => {
             const message = data.toString();
             if (message === "STOP") {
                 fileStream.end();
-                // whisperWs.close();
 
                 const ffmpeg = spawn("ffmpeg", ["-i", tempFile, "-c", "copy", finalFile]);
 
@@ -84,7 +69,7 @@ async function transcribeFile(filePath, clientWs) {
 
     // To print only the transcription text, you'd use console.log(transcription.text); (here we're printing the entire transcription object to access timestamps)
 
-    console.log(`Transcription: ${JSON.stringify(transcription, null, 4)}`);
+    console.log(`Transcription: ${textTranscription}`);
 
     if (clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(JSON.stringify({ type: "transcription", data: transcription }));
@@ -95,7 +80,8 @@ async function transcribeFile(filePath, clientWs) {
     const textSummary = summary.choices[0].message.content;
     // const summary = (await summarizeTranscription(transcription.text)).choices[0].message.content;
 
-    console.log(`Summary: ${JSON.stringify(summary, null, 4)}`);
+    // console.log(`Summary: ${JSON.stringify(summary, null, 4)}`);
+    console.log(`Summary: ${textSummary}`);
 
     if (summary && clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(
