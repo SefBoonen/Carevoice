@@ -4,3 +4,5 @@
 .env.groq
 
 node_modules
+
+*.webm
