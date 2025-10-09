@@ -1,6 +1,7 @@
 .env
 .env.prod
 .env.local
+.env.groq
 
 node_modules
 
