@@ -1,9 +1,10 @@
 const recordBtn = document.getElementById("recordbtn");
 const btnIcon = document.querySelector(".btn-icon");
 const btnText = document.querySelector(".btn-text");
-const transcriptionDiv = document.getElementById("transcription");
 
+const transcriptionDiv = document.getElementById("transcription");
 const summaryDiv = document.getElementById("summary");
+const polisDiv = document.getElementById("polis");
 
 let socket = null;
 let mediaRecorder = null;
@@ -45,6 +46,11 @@ async function startRecording() {
                 console.log(`samenvatting: ${data.data}`);
                 if (data.data) {
                     summaryDiv.textContent += data.data + " ";
+                }
+            } else if (data.type === "polis") {
+                console.log(`polis: ${data.data}`);
+                if (data.data) {
+                    polisDiv.textContent += data.data + " ";
                 }
                 socket.close();
                 resetButton();

@@ -139,7 +139,7 @@ async function polisVoorwaarden(text) {
                 },
                 {
                     role: "user",
-                    content: `Geef me een samenvatting van wat wordt gedekt en voorwaarden aan de hand van deze tekst: ${text} en deze polisvoorwaarden: ${polisVoorwaarden}`,
+                    content: `Geef me een samenvatting van wat wordt gedekt en voorwaarden aan de hand van deze tekst: ${text} en deze polisvoorwaarden: ${polisText}`,
                 },
             ],
             model: "openai/gpt-oss-20b",

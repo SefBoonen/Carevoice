@@ -162,7 +162,9 @@ body {
 
 /* ========== Transcription & Summary Areas ========== */
 .transcription-container, 
-.summary-container {
+.summary-container,
+.polis-container
+ {
     margin-top: 2.5rem;
     padding-top: 2.5rem;
     border-top: 1px solid var(--border-color);
@@ -174,7 +176,8 @@ body {
 }
 
 .transcription-container h3, 
-.summary-container h3 {
+.summary-container h3,
+.polis-container h3 {
     font-size: 1.125rem;
     margin-bottom: 1rem;
     color: var(--text-color);
@@ -183,7 +186,8 @@ body {
 }
 
 .transcription-text, 
-.summary-text {
+.summary-text,
+.polis-text {
     background-color: #fafafa;
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -207,6 +211,12 @@ body {
 
 .summary-text:empty::before {
     content: 'Uw samenvatting verschijnt hier...';
+    color: var(--text-muted);   
+    font-style: normal;
+}
+
+.polis-text:empty::before {
+    content: 'Uw polisdekking verschijnt hier...';
     color: var(--text-muted);   
     font-style: normal;
 }
