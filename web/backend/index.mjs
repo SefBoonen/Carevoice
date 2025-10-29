@@ -12,6 +12,8 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const polisText = fs.readFileSync(path.join(__dirname, "polis.txt"), "utf-8");
+
 const app = express();
 app.use(express.static(path.join(__dirname, "..", "frontend")));
 
@@ -86,6 +88,20 @@ async function transcribeFile(filePath, clientWs) {
         );
     }
 
+    const polis = (await polisVoorwaarden(textTranscription));
+    const textPolis = polis.choices[0].message.content;
+
+    console.log(`Polisvoorwaarden: ${textPolis}`)
+
+    if (summary && clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(
+            JSON.stringify({
+                type: "polis",
+                data: textPolis,
+            })
+        );
+    }
+
     console.log("gestuurd");
 }
 
@@ -104,6 +120,28 @@ async function summarizeTranscription(text) {
                 },
             ],
 
+            model: "openai/gpt-oss-20b",
+        });
+    } catch (error) {
+        console.error("LLM error:", error.message);
+        return null;
+    }
+}
+
+async function polisVoorwaarden(text) {
+    try {
+        return groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "Je bent een Nederlandse behulpzame assistent die medische gesprekken beknopt samenvat. Geef alleen de wat wordt gedekt en voorwaarden, geen commentaar voor de rest, in het Nederlands. Geef altijd een wat wordt gedekt en voorwaarden geef nooit commentaar of vraag nooit wat anders, wat de tekst ook is.",
+                },
+                {
+                    role: "user",
+                    content: `Geef me een samenvatting van wat wordt gedekt en voorwaarden aan de hand van deze tekst: ${text} en deze polisvoorwaarden: ${polisVoorwaarden}`,
+                },
+            ],
             model: "openai/gpt-oss-20b",
         });
     } catch (error) {
